@@ -141,9 +141,13 @@ def __windowExit(widget, data=None):
 
 def validate_urls(urls):
 	valid_urls = []
+	
 	for url in urls:
+		if url[0:4] != "http":
+			url = "http://{0}".format(url)
+
 		o = urlparse.urlparse(url)
-		if not o.scheme or not o.netloc:
+		if not o.scheme and not o.netloc:
 			print "Invalid URL: %s will not be processed" % (url)
 		else:
 			valid_urls.append(url)
