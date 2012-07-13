@@ -3,7 +3,7 @@
 # http://burtonini.com/computing/screenshot-tng.py
 # Ben Dowling - http://www.coderholic.com
 # Further customized:
-# http://rewtdance.blogspot.com
+# Meatballs - http://rewtdance.blogspot.com
 
 import os
 import sys
@@ -47,7 +47,8 @@ class PyWebShot:
 		else:
 			self.outfile_base = None
 		self.parent.add(self.widget)
-		self.parent.fullscreen()
+		if screen == get_screen_resolution():
+			self.parent.fullscreen()
 		self.parent.show_all()
 		self.url_num = 0
 		self.load_next_url()
@@ -163,20 +164,23 @@ def take_screenshots(urls, resolution=get_screen_resolution(), thumb_resolution=
         else:
                 print "No Valid URLs specified"
 
+def main():
+        usage = "usage: %prog [options] url1 [url2 ... urlN]"
+        parser = OptionParser(usage=usage)
+        parser.add_option('-r', '--resolution', action='store', type='string', help='Screen resolution at which to capture the webpage (default full screen resolution - %default)', default=get_screen_resolution())
+        parser.add_option('-t', '--thumb-res', dest="thumbnail_resolution", action='store', type='string', help='Thumbnail resolution (default %default)', default=None)
+        parser.add_option('-d', '--delay', action='store', type='int', help='Delay in seconds to wait after page load before taking the screenshot (default %default)', default=0.01)
+        parser.add_option('-f', '--filename', action='store', type='string', help='PNG output filename with .png extension, otherwise default is based on url name and given a .png extension')
+        parser.add_option('-p', '--path', action='store', type='string', help='Output path (default pwd)', default=os.getcwd())
+        parser.add_option('-j', '--allow-jscript', action='store_true', dest='jscript', default=False, help='Allow Javascript (default %default)')
+        (options,args) = parser.parse_args()
+
+        if len(args) == 0:
+                print "No URL specified"
+                parser.print_help()
+                return None
+
+        take_screenshots(args, options.resolution, options.thumbnail_resolution, options.delay, options.filename, options.path, options.jscript)
 
 if __name__ == "__main__":
-	usage = "usage: %prog [options] url1 [url2 ... urlN]"
-	parser = OptionParser(usage=usage)
-	parser.add_option('-r', '--resolution', action='store', type='string', help='Screen resolution at which to capture the webpage (default %default)', default=get_screen_resolution())
-	parser.add_option('-t', '--thumbnail-resolution', dest="thumbnail_resolution", action='store', type='string', help='Thumbnail resolution (default %default)', default=None)
-	parser.add_option('-d', '--delay', action='store', type='int', help='Delay in seconds to wait after page load before taking the screenshot (default %default)', default=0.01)
-	parser.add_option('-f', '--filename', action='store', type='string', help='PNG output filename with .png extension, otherwise default is based on url name and given a .png extension')
-	parser.add_option('-p', '--path', action='store', type='string', help='Output path', default=os.getcwd())
-	parser.add_option('-j', '--allow-jscript', action='store_true', dest='jscript', default=False, help='Allow Javascript, disabled by default as it can cause segmentation faults')
-	(options,args) = parser.parse_args()
-
-	if len(args) == 0:
-		print "No URL specified"	
-		parser.print_help()
-	
-	take_screenshots(args, options.resolution, options.thumbnail_resolution, options.delay, options.filename, options.path, options.jscript)	
+	main()

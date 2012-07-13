@@ -1,28 +1,39 @@
 PyWebShot
 =========
 
-Automatically generate thumbnails for 1 or more websites from the command line. Requires the python-gtkmozembed package.
+Automatically generate thumbnails for 1 or more websites from the command line. Requires the python-gtkmozembed package (apt-get installpython-gtkmozembed)
 
+Enhanced by:
+Meatballs - http://rewtdance.blogspot.com
+
+Ignores SSL certificate warnings and authentication prompts.
+Strips javascript by default preventing segmentation faults on some pages.
+Importable into other Python modules with pywebshot.take_screenshots(urls) method.
+Disabled thumbnails by default and defaults to fullscreen resolution.
+Reduced delay before taking snap.
+
+Original Author:
 Ben Dowling - http://www.coderholic.com
 
-Usage
------
-pywebshot.py [options] url1 [url2 ... urlN]
+Usage: pywebshot.py [options] url1 [url2 ... urlN]
 
 Options:
   -h, --help            show this help message and exit
-  -s SCREEN, --screen=SCREEN
+  -r RESOLUTION, --resolution=RESOLUTION
                         Screen resolution at which to capture the webpage
-                        (default 1024x769)
-  -t THUMBNAIL, --thumbnail=THUMBNAIL
-                        Thumbnail resolution (default 350x200)
+                        (default full screen resolution - 1366x768)
+  -t THUMBNAIL_RESOLUTION, --thumb-res=THUMBNAIL_RESOLUTION
+                        Thumbnail resolution (default none)
   -d DELAY, --delay=DELAY
                         Delay in seconds to wait after page load before taking
-                        the screenshot (default 0)
+                        the screenshot (default 0.01)
   -f FILENAME, --filename=FILENAME
                         PNG output filename with .png extension, otherwise
                         default is based on url name and given a .png
                         extension
+  -p PATH, --path=PATH  Output path (default pwd)
+  -j, --allow-jscript   Allow Javascript (default False)
+
 
 Examples
 --------
@@ -35,3 +46,6 @@ pywebshot.py page_with_delayed_content.com -d10
 pywebshot.py -f /tmp/shot.png google.com
 # multiple url will output to /tmp/shot-1.png and /tmp/shot-2.png
 pywebshot.py -f /tmp/shot.png google.com yahoo.com
+
+# hide windows thanks to: http://www.binarytides.com/blog/take-webpage-screenshot-from-command-line-in-ubuntu-linux/
+xvfb-run --server-args="-screen 0, 1024x768x24" python pywebshot.py
