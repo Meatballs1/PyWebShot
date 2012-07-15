@@ -26,6 +26,14 @@ class PyWebShot:
 	def __init__(self, urls, screen, thumbnail, delay, outfile, path, allow_javascript):
 		self.parent = gtk.Window(gtk.WINDOW_TOPLEVEL)
 		self.parent.set_border_width(0)
+		self.panel = gtk.VPaned()
+		self.top_panel = gtk.VPaned()
+		self.urlbar = gtk.Label()
+		self.titlebar = gtk.Label()
+		self.top_panel.add1(self.titlebar)
+		self.top_panel.add2(self.urlbar)	
+		self.panel.add1(self.top_panel)
+		self.parent.add(self.panel)
 		self.urls = urls
 		self.delay = delay
 		self.path = path
@@ -43,11 +51,12 @@ class PyWebShot:
 		
 		# Connect signal
 		self.widget.connect("net_stop", self.on_net_stop)
+		self.widget.connect("title", self.update_titlebar)
 		if outfile:
 			(self.outfile_base, ignore) = outfile.split('.png')
 		else:
 			self.outfile_base = None
-		self.parent.add(self.widget)
+		self.panel.add2(self.widget)
 		if screen == get_screen_resolution():
 			self.parent.fullscreen()
 		self.parent.show_all()
@@ -59,6 +68,7 @@ class PyWebShot:
 			gtk.main_quit()
 			return
 		self.current_url = self.urls[self.url_num]
+		self.urlbar.set_text(self.current_url)
 		self.parent.set_title(self.current_url)
 		self.countdown = self.delay
 		print "Loading " + self.current_url + "...", 
@@ -98,9 +108,12 @@ class PyWebShot:
 			self.screenshot()
 			self.load_next_url()
 			return False
+	
+	def update_titlebar(self, data = None):
+		self.titlebar.set_text(self.widget.get_title())
 
 	def screenshot(self, data = None):
-		window = self.widget.window
+		window = self.parent.window
 		(x,y,width,height,depth) = window.get_geometry()
 		pixbuf = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB,False,8,width,height)
 		pixbuf.get_from_drawable(window,self.widget.get_colormap(),0,0,0,0,width,height)
