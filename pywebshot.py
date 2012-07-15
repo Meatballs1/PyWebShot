@@ -7,6 +7,7 @@
 
 import os
 import sys
+import socket
 try:
 	import gtk
 	import gtk.gdk as gdk
@@ -63,16 +64,23 @@ class PyWebShot:
 		print "Loading " + self.current_url + "...", 
 		self.url_num += 1
 		request = urllib2.Request(self.current_url)
+		html = ""
 		try:
 			fd = urllib2.urlopen(request)
 			if not fd.geturl() in self.current_url:
 				print "Redirected to {0} ...".format(fd.geturl())
 				self.current_url = fd.geturl()
-			html = fd.read()
-			fd.close()
+			try:
+				html = fd.read()
+			except socket.error as e:
+				print e	
+			finally:
+				fd.close()
 		except urllib2.HTTPError as e:
 			html = e.read()
 			e.close()
+		except urllib2.URLError as e:
+			print e
 		# Some Javascript causes Seg Fault
 		if not self.allow_javascript:
 			html = strip_javascript(html)
